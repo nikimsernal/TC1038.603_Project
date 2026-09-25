@@ -1,17 +1,20 @@
-# ==========================================
-# PROYECTO INTEGRADOR: TC1038.603
-# Habit Tracker y Gestor de Productividad
-# ==========================================
-# Kimberly Nikita Serna Lerma
-# A00848442
-# GitHub Repo: https://github.com/nikimsernal/TC1038.603
-# ==========================================
+"""
+==========================================
+PROYECTO INTEGRADOR: TC1038.603
+Habit Tracker y Gestor de Productividad
+==========================================
+Kimberly Nikita Serna Lerma
+GitHub Repo: https://github.com/nikimsernal/TC1038.603
+==========================================
+"""
 
 import math
 
-# ==========================================
-# FUNCIONES DE HABITOS
-# ==========================================
+"""
+==========================================
+FUNCIONES DE HABITOS
+==========================================
+"""
 
 # Agrega un nuevo habito a la lista.
 def agregar_habito(habitos, nombre, meta):
@@ -41,9 +44,11 @@ def mostrar_habitos(habitos):
             print(i, "-", habitos[i]["nombre"], "| Meta:", habitos[i]["meta"], "| Completados:", habitos[i]["completados"] )
 
 
-# ==========================================
-# FUNCIONES DE TO-DO LIST
-# ==========================================
+"""
+==========================================
+FUNCIONES DE TO-DO LIST
+==========================================
+"""
 
 # Agrega una nueva tarea a la lista de pendientes.
 # "origen" indica de donde viene la tarea:
@@ -75,9 +80,11 @@ def mostrar_tareas(tareas):
             estado = "Completada" if tareas[i]["completada"] else "Pendiente"
             print(i, "-", tareas[i]["nombre"], "| Origen:", tareas[i]["origen"], "| Estado:", estado )
 
-# ==========================================
-# FUNCIONES DE ESTADISTICAS
-# ==========================================
+"""
+==========================================
+FUNCIONES DE ESTADISTICAS
+==========================================
+"""
 
 # Calcula el porcentaje de cumplimiento
 # considerando todos los habitos.
@@ -110,9 +117,11 @@ def mostrar_estadisticas(habitos):
     else:
         print("Necesitas mayor constancia.")
 
-# ==========================================
-# FUNCIONES PENDIENTES
-# ==========================================
+"""
+==========================================
+FUNCIONES PENDIENTES
+==========================================
+"""
 
 # Pendiente:
 # Obtener eventos desde Google Calendar y agregarlos como tareas en la to-do list.
@@ -147,9 +156,12 @@ def sincronizar_canvas(tareas):
 def obtener_estadisticas_kindle():
     print("Pendiente: obtener estadisticas de Kindle.")
 
-# ==========================================
-# MENU PRINCIPAL
-# ==========================================
+"""
+==========================================
+MENU PRINCIPAL
+==========================================
+"""
+
 def menu():
     print("\n===== HABIT TRACKER =====")
     print("1. Agregar habito")
@@ -167,9 +179,12 @@ def menu():
     opcion = int(input("Selecciona una opcion: "))
     return opcion
 
-# ==========================================
-# FUNCION PRINCIPAL
-# ==========================================
+"""
+==========================================
+FUNCION PRINCIPAL
+==========================================
+"""
+
 def main():
     habitos = []
     tareas = []
