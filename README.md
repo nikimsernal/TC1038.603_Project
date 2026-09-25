@@ -6,8 +6,6 @@ Proyecto Integrador de la materia **TC1038.603**.
 
 **Nombre:** Kimberly Nikita Serna Lerma
 
-**Matrícula:** A00848442
-
 ## Descripción del proyecto
 
 Este proyecto consiste en un sistema de seguimiento de hábitos (*Habit Tracker*) y gestión de tareas (*To-Do List*) desarrollado en Python.
