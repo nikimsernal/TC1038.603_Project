@@ -51,7 +51,6 @@ Estas funcionalidades se encuentran declaradas y documentadas como parte de la p
 ### Estadísticas
 
 * Porcentaje de cumplimiento.
-* Sistema de experiencia (XP).
 
 ### Funciones pendientes
 
