@@ -94,24 +94,12 @@ def calcular_porcentaje(habitos):
     porcentaje = (total_realizado / total_meta) * 100
     return porcentaje
 
-# Calcula una puntuacion general.
-# Se utiliza math.floor para redondear.
-def calcular_xp(habitos):
-    total = 0
-    for habito in habitos:
-        total += habito["completados"]
-
-    xp = math.floor(total * 10)
-    return xp
-
 # Muestra un resumen de productividad.
 def mostrar_estadisticas(habitos):
     porcentaje = calcular_porcentaje(habitos)
-    xp = calcular_xp(habitos)
 
     print("\n=== ESTADISTICAS ===")
     print("Cumplimiento:", round(porcentaje, 2), "%")
-    print("XP acumulada:", xp)
 
     if porcentaje >= 100:
         print("Excelente trabajo.")
