@@ -14,51 +14,80 @@ El objetivo es ayudar al usuario a organizar sus actividades, registrar el progr
 
 Actualmente el programa permite:
 
-* Registrar hábitos.
-* Registrar tareas.
-* Marcar hábitos como completados.
-* Marcar tareas como completadas.
-* Consultar listas de hábitos y tareas.
-* Calcular porcentaje de cumplimiento.
-* Mostrar estadísticas de productividad.
+1. To-Do List
 
-Además, se incluyen funciones pendientes para futuras integraciones con:
+Agregar tareas pendientes.
 
-* Google Calendar.
-* Canvas LMS.
-* Kindle.
+Visualizar las tareas registradas.
 
-Estas funcionalidades se encuentran declaradas y documentadas como parte de la planeación del proyecto.
+Eliminar todas las tareas.
+
+Guardar y recuperar tareas mediante tasks.csv.
+
+2. Habit Tracker
+
+Registrar nuevos hábitos y establecer una meta de cumplimiento.
+
+Visualizar los hábitos y su progreso.
+
+Marcar hábitos como completados en días específicos.
+
+Evitar registros duplicados del mismo hábito durante un mismo día.
+
+Consultar el historial total de hábitos completados.
+
+3. Weekly Tracking Matrix
+
+Registrar el cumplimiento de hábitos durante los siete días de la semana.
+
+Visualizar los registros mediante una matriz semanal.
+
+Identificar rápidamente los días en los que se completó cada hábito.
+
+Reiniciar los registros semanales sin eliminar el historial acumulado.
+
+4. Statistics
+
+Calcular el porcentaje de progreso semanal.
+
+Consultar el número de hábitos completados por día.
+
+Visualizar el total histórico de hábitos completados.
+
+Obtener indicadores generales del cumplimiento de las metas.
+
+5. Planeación futura
+
+- Frontend con HTML y CSS
+- Sincronización con Google Calendar y posiblemente CanvasLM
 
 ---
 
-## Estructura general
+Tecnologías y conceptos utilizados
 
-### Gestión de hábitos
+El proyecto utiliza Python y los siguientes conceptos de programación:
 
-* Agregar hábito.
-* Registrar cumplimiento.
-* Mostrar hábitos.
+Variables y constantes.
 
-### Gestión de tareas
+Tipos de datos y operaciones aritméticas.
 
-* Agregar tarea.
-* Completar tarea.
-* Mostrar tareas.
+Condicionales (if, elif, else).
 
-### Estadísticas
+Estructuras de repetición (while, for).
 
-* Porcentaje de cumplimiento.
+Funciones y parámetros.
 
-### Funciones pendientes
+Listas y matrices.
 
-* Sincronización con Google Calendar.
-* Sincronización con Canvas LMS.
-* Estadísticas de Kindle.
+Manipulación de cadenas de texto.
+
+Estructuras de selección (match).
+
+Lectura y escritura de archivos CSV.
 
 ---
 
 ## Estado del proyecto
 
-Este repositorio corresponde al avance actual del Proyecto Integrador. 
-Algunas funcionalidades se encuentran implementadas y otras han sido definidas como trabajo futuro para etapas posteriores del curso.
+Este repositorio corresponde al avance 3 del Proyecto Integrador. 
+Algunas funcionalidades se encuentran implementadas y serán agregadas como trabajo futuro para etapas posteriores del curso.
