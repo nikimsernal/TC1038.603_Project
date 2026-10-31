@@ -1,3 +1,4 @@
+
 """
 ==========================================
 PROYECTO INTEGRADOR: TC1038.603
@@ -8,222 +9,353 @@ GitHub Repo: https://github.com/nikimsernal/TC1038.603
 ==========================================
 """
 
-import math
+import csv
 
-"""
-==========================================
-FUNCIONES DE HABITOS
-==========================================
-"""
+TASKS_FILE = "tasks.csv"
+HABITS_FILE = "habits.csv"
+DAYS = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"]
 
-# Agrega un nuevo habito a la lista.
-def agregar_habito(habitos, nombre, meta):
-    habito = {
-        "nombre": nombre,
-        "meta": meta,
-        "completados": 0
-    }
-    habitos.append(habito)
-    print("Habito agregado correctamente.")
+# ==========================================
+# FUNCIONES DE TO-DO LIST
+# ==========================================
+# Carga las tareas almacenadas en el archivo CSV.
+def load_tasks():
+    try:
+        with open(TASKS_FILE, "r", newline="", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            task_list = [row[0] for row in reader if row]
+    except FileNotFoundError:
+        task_list = []
+    return task_list
 
-# Registra una realizacion del habito.
-def completar_habito(habitos, indice):
-    if indice >= 0 and indice < len(habitos):
-        habitos[indice]["completados"] += 1
-        print("Habito actualizado.")
-    else:
-        print("Indice invalido.")
+# Guarda las tareas actuales en el archivo CSV.
+def save_tasks(task_list):
+    with open(TASKS_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerows([[task] for task in task_list])
 
-# Muestra todos los habitos registrados.
-def mostrar_habitos(habitos):
-    if len(habitos) == 0:
-        print("No hay habitos registrados.")
-    else:
-        print("\n=== HABITOS ===")
-        for i in range(len(habitos)):
-            print(i, "-", habitos[i]["nombre"], "| Meta:", habitos[i]["meta"], "| Completados:", habitos[i]["completados"] )
+# Agrega una nueva tarea si el nombre no está vacío.
+def add_task(task_list, task):
+    if task.strip() != "":
+        task_list.append(task.strip())
+        save_tasks(task_list)
+        return True
+    return False
 
-
-"""
-==========================================
-FUNCIONES DE TO-DO LIST
-==========================================
-"""
-
-# Agrega una nueva tarea a la lista de pendientes.
-# "origen" indica de donde viene la tarea:
-# "Manual", "Canvas" o "Google Calendar".
-def agregar_tarea(tareas, nombre, origen="Manual"):
-    tarea = {
-        "nombre": nombre,
-        "origen": origen,
-        "completada": False
-    }
-    tareas.append(tarea)
-    print("Tarea agregada correctamente.")
-
-# Marca una tarea como completada.
-def completar_tarea(tareas, indice):
-    if indice >= 0 and indice < len(tareas):
-        tareas[indice]["completada"] = True
-        print("Tarea marcada como completada.")
-    else:
-        print("Indice invalido.")
+# Elimina todas las tareas registradas.
+def clear_tasks(task_list):
+    task_list.clear()
+    save_tasks(task_list)
 
 # Muestra todas las tareas registradas.
-def mostrar_tareas(tareas):
-    if len(tareas) == 0:
-        print("No hay tareas registradas.")
+def display_tasks(task_list):
+    if len(task_list) == 0:
+        print("No hay nada pendiente aún.")
     else:
-        print("\n=== TO-DO LIST ===")
-        for i in range(len(tareas)):
-            estado = "Completada" if tareas[i]["completada"] else "Pendiente"
-            print(i, "-", tareas[i]["nombre"], "| Origen:", tareas[i]["origen"], "| Estado:", estado )
+        print("\n======= PENDIENTES =======")
+        for i, task in enumerate(task_list):
+            print(f"{i + 1}. {task}")
 
-"""
-==========================================
-FUNCIONES DE ESTADISTICAS
-==========================================
-"""
+# ==========================================
+# FUNCIONES DE HABIT TRACKER
+# ==========================================
+#Carga los hábitos y su matriz semanal desde CSV.
+#ada hábito tiene una fila con siete columnas adicionales,
+#una por cada día de la semana.
+def load_habits():
+    habit_list = []
+    weekly_history = []
+    try:
+        with open(HABITS_FILE, "r", newline="", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if len(row) == 10:
+                    habit = {"name": row[0], "goal": int(row[1]), "completed": int(row[2])}
+                    history = []
+                    for value in row[3:10]:
+                        history.append(int(value))
+                # Recupera hábitos del formato anterior.
+                elif len(row) == 3:
+                    habit = {"name": row[0], "goal": int(row[1]), "completed": int(row[2])}
+                    history = [0, 0, 0, 0, 0, 0, 0]
+                else:
+                    continue
+                habit_list.append(habit)
+                weekly_history.append(history)
+    except FileNotFoundError:
+        pass
+    return habit_list, weekly_history
 
-# Calcula el porcentaje de cumplimiento
-# considerando todos los habitos.
-def calcular_porcentaje(habitos):
-    total_meta = 0
-    total_realizado = 0
 
-    for habito in habitos:
-        total_meta += habito["meta"]
-        total_realizado += habito["completados"]
-    if total_meta == 0:
+# Guarda los hábitos y su matriz semanal en CSV.
+def save_habits(habit_list, weekly_history):
+    with open(HABITS_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        for i in range(len(habit_list)):
+            writer.writerow([
+                habit_list[i]["name"],
+                habit_list[i]["goal"],
+                habit_list[i]["completed"]
+            ] + weekly_history[i])
+
+
+# Registra un nuevo hábito con una meta semanal.
+# También agrega una fila de siete ceros a la matriz.
+def add_habit(habit_list, weekly_history, name, goal):
+    if name.strip() != "" and goal > 0:
+        habit = {"name": name.strip(), "goal": goal, "completed": 0}
+        habit_list.append(habit)
+        # Cada columna es un día de la semana.
+        weekly_history.append([0, 0, 0, 0, 0, 0, 0])
+        save_habits(habit_list, weekly_history)
+        return True
+    return False
+
+
+# Registra el cumplimiento de un hábito en un día específico.
+# Evita registrar dos veces el mismo hábito durante el mismo día.
+def complete_habit(habit_list, weekly_history, index, day):
+    if index >= 0 and index < len(habit_list):
+        if day >= 0 and day < 7:
+            if weekly_history[index][day] == 0:
+                weekly_history[index][day] = 1
+                habit_list[index]["completed"] += 1
+                save_habits(habit_list, weekly_history)
+                print("¡Sigue así! Progreso actualizado.")
+            else:
+                print("Este hábito ya fue completado ese día.")
+        else:
+            print("Día inválido.")
+    else:
+        print("Número de hábito inválido.")
+
+
+# Muestra los hábitos y su progreso semanal.
+def display_habits(habit_list, weekly_history):
+    if len(habit_list) == 0:
+        print("Sin hábitos aún.")
+    else:
+        print("\n===== HABIT TRACKER =====")
+        for i, habit in enumerate(habit_list):
+            weekly_completed = sum(weekly_history[i])
+            percentage = min((weekly_completed / habit["goal"]) * 100, 100)
+            print(f"\n{i + 1}. {habit['name']}")
+            print(f" Meta semanal: {habit['goal']}")
+            print(f" Completado esta semana: {weekly_completed}")
+            print(f" Total histórico: {habit['completed']}")
+            print(f" Progreso semanal: {percentage:.2f}%")
+
+
+# Elimina todos los hábitos y sus registros.
+def clear_habits(habit_list, weekly_history):
+    habit_list.clear()
+    weekly_history.clear()
+    save_habits(habit_list, weekly_history)
+
+
+# ==========================================
+# MATRIZ SEMANAL
+# ==========================================
+def display_weekly_matrix(habit_list, weekly_history):
+    if len(habit_list) == 0:
+        print("No hay hábitos registrados.")
+
+    else:
+        print("\n========== HISTORIAL SEMANAL ==========")
+        print(f"{'Hábito':<18}", end="")
+        for day in DAYS:
+            print(f"{day:>6}", end="")
+        print()
+        
+        for i in range(len(habit_list)):
+            print(f"{habit_list[i]['name']:<18}", end="")
+            for j in range(7):
+                if weekly_history[i][j] == 1:
+                    symbol = "X"
+                else:
+                    symbol = "-"
+                print(f"{symbol:>6}", end="")
+            print()
+        print("\nX = Completado | - = Pendiente")
+
+
+# Calcula el porcentaje global de cumplimiento semanal.
+def calculate_progress(habit_list, weekly_history):
+    total_goal = 0
+    total_completed = 0
+    for i in range(len(habit_list)):
+        total_goal += habit_list[i]["goal"]
+        total_completed += min(sum(weekly_history[i]), habit_list[i]["goal"])
+    if total_goal == 0:
         return 0
+    percentage = (total_completed / total_goal) * 100
+    return percentage
 
-    porcentaje = (total_realizado / total_meta) * 100
-    return porcentaje
 
-# Muestra un resumen de productividad.
-def mostrar_estadisticas(habitos):
-    porcentaje = calcular_porcentaje(habitos)
+# Cuenta cuántos hábitos se completaron en un día específico.
+def calculate_daily_progress(weekly_history, day):
+    total = 0
+    if day >= 0 and day < 7:
+        for i in range(len(weekly_history)):
+            if weekly_history[i][day] == 1:
+                total += 1
+    return total
 
-    print("\n=== ESTADISTICAS ===")
-    print("Cumplimiento:", round(porcentaje, 2), "%")
 
-    if porcentaje >= 100:
-        print("Excelente trabajo.")
-    elif porcentaje >= 70:
-        print("Buen progreso.")
-    elif porcentaje >= 40:
-        print("Puedes mejorar.")
+# Reinicia la matriz semanal sin eliminar el historial acumulado de cada hábito.
+def reset_weekly_matrix(habit_list, weekly_history):
+    for i in range(len(weekly_history)):
+        for j in range(7):
+            weekly_history[i][j] = 0
+    save_habits(habit_list, weekly_history)
+    print("¡Nueva semana! El seguimiento se ha reiniciado.")
+
+
+# ==========================================
+# FUNCIONES DE ESTADÍSTICAS
+# ==========================================
+def display_statistics(habit_list, weekly_history):
+    percentage = calculate_progress(habit_list, weekly_history)
+    print("\n===== ESTADÍSTICAS DE PRODUCTIVIDAD =====")
+    print(f"Progreso general de hábitos: {percentage:.2f}%")
+
+    if len(habit_list) > 0:
+        total_completed = 0
+        for habit in habit_list:
+            total_completed += habit["completed"]
+            
+        print(f"Total histórico de hábitos completados: {total_completed}")
+        print("\n===== CUMPLIMIENTO POR DÍA =====")
+        
+        for i in range(7):
+            daily_total = calculate_daily_progress(weekly_history, i)
+            print(f"{DAYS[i]}: {daily_total} hábitos completados")
+
+    if percentage >= 100:
+        print("\n¡Todas tus metas están completas! ¡Felicidades!")
+    elif percentage >= 70:
+        print("\n¡Vas muy bien!")
+    elif percentage >= 40:
+        print("\n¡Sigue así!")
     else:
-        print("Necesitas mayor constancia.")
+        print("\nEl mejor momento para empezar es ahora.")
 
-"""
-==========================================
-FUNCIONES PENDIENTES
-==========================================
-"""
 
-# Pendiente:
-# Obtener eventos desde Google Calendar y agregarlos como tareas en la to-do list.
-# Cuando se conecte la API real de Google Calendar, aqui se debe:
-#   1. Autenticarse con las credenciales del usuario.
-#   2. Obtener la lista de eventos proximos.
-#   3. Por cada evento, llamar a agregar_tarea()
-#      usando el titulo del evento como nombre y "Google Calendar" como origen.
-def sincronizar_google_calendar(tareas):
-    print("Pendiente: sincronizacion con Google Calendar.")
-    # Simulacion temporal mientras no hay conexion real:
-    eventos_simulados = ["Reunion de equipo", "Entrega de proyecto"]
-    for evento in eventos_simulados:
-        agregar_tarea(tareas, evento, "Google Calendar")
+# ==========================================
+# MENU PRINCIPAL
+# ==========================================
+def main_menu():
+    print("\n================================")
+    print("       SHELL CHECK TRACKER")
+    print("================================")
 
-# Pendiente:
-# Obtener tareas desde Canvas LMS y agregarlas a la to-do list.
-# Cuando se conecte la API real de Canvas, aqui se debe:
-#   1. Autenticarse con el token de acceso del usuario.
-#   2. Obtener la lista de tareas/asignaciones pendientes.
-#   3. Por cada tarea, llamar a agregar_tarea()
-#      usando el nombre de la asignacion como nombre y "Canvas" como origen.
-def sincronizar_canvas(tareas):
-    print("Pendiente: sincronizacion con Canvas LMS.")
-    # Simulacion temporal mientras no hay conexion real:
-    tareas_simuladas = ["Tarea de Matematicas", "Lectura Capitulo 3"]
-    for tarea in tareas_simuladas:
-        agregar_tarea(tareas, tarea, "Canvas")
+    print("\n===== TO-DO LIST =====")
+    print("1. Mostrar Pendientes")
+    print("2. Agregar Pendiente")
+    print("3. Borrar Todo")
 
-# Pendiente:
-# Obtener estadisticas de lectura Kindle.
-def obtener_estadisticas_kindle():
-    print("Pendiente: obtener estadisticas de Kindle.")
-
-"""
-==========================================
-MENU PRINCIPAL
-==========================================
-"""
-
-def menu():
     print("\n===== HABIT TRACKER =====")
-    print("1. Agregar habito")
-    print("2. Completar habito")
-    print("3. Mostrar habitos")
-    print("4. Ver estadisticas")
-    print("5. Google Calendar")
-    print("6. Canvas LMS")
-    print("7. Kindle")
-    print("8. Agregar tarea a To-Do List")
-    print("9. Completar tarea")
-    print("10. Mostrar To-Do List")
-    print("0. Salir")
+    print("4. Mostrar Hábitos")
+    print("5. Agregar Hábito")
+    print("6. Completar Hábito")
+    print("7. Borrar Hábitos")
+    print("8. Estadísticas de Productividad")
 
-    opcion = int(input("Selecciona una opcion: "))
-    return opcion
+    print("\n===== SEGUIMIENTO SEMANAL =====")
+    print("9. Mostrar Matriz Semanal")
+    print("10. Reiniciar Semana")
 
-"""
-==========================================
-FUNCION PRINCIPAL
-==========================================
-"""
+    print("\n0. Salir")
+    option = input("\nSelecciona una opción: ")
+    return option
 
+
+# ==========================================
+# FUNCIÓN PRINCIPAL
+# ==========================================
 def main():
-    habitos = []
-    tareas = []
-    salir = False
+    task_list = load_tasks()
+    habit_list, weekly_history = load_habits()
 
-    while not salir:
-        opcion = menu()
-        match opcion:
-            case 1:
-                nombre = input("Nombre del habito: ")
-                meta = int(input("Meta semanal: "))
-                agregar_habito(habitos, nombre, meta)
-            case 2:
-                mostrar_habitos(habitos)
-                indice = int(input("Indice del habito: "))
-                completar_habito(habitos, indice)
-            case 3:
-                mostrar_habitos(habitos)
-            case 4:
-                mostrar_estadisticas(habitos)
-            case 5:
-                sincronizar_google_calendar(tareas)
-            case 6:
-                sincronizar_canvas(tareas)
-            case 7:
-                obtener_estadisticas_kindle()
-            case 8:
-                nombre = input("Nombre de la tarea: ")
-                agregar_tarea(tareas, nombre, "Manual")
-            case 9:
-                mostrar_tareas(tareas)
-                indice = int(input("Indice de la tarea: "))
-                completar_tarea(tareas, indice)
-            case 10:
-                mostrar_tareas(tareas)
-            case 0:
-                salir = True
-                print("Hasta luego.")
+    while True:
+        option = main_menu()
+        match option:
+            # TO-DO LIST
+            case "1":
+                display_tasks(task_list)
+
+            case "2":
+                task = input("Agregar Pendiente: ")
+                if add_task(task_list, task):
+                    print("¡Agregado con éxito!")
+                else:
+                    print("El nombre no puede estar vacío.")
+
+            case "3":
+                clear_tasks(task_list)
+                print("¡Qué gran nuevo comienzo!")
+
+            # HABIT TRACKER
+            case "4":
+                display_habits(habit_list, weekly_history)
+
+            case "5":
+                name = input("Agregar Nuevo Hábito: ")
+                goal_input = input("Meta semanal: ")
+                if goal_input.isdigit():
+                    goal = int(goal_input)
+                    if add_habit(habit_list, weekly_history, name, goal ):
+                        print("¡Hábito agregado con éxito!")
+                    else:
+                        print("Información inválida.")
+                else:
+                    print("Ingresa un número válido.")
+
+            case "6":
+                display_habits(habit_list, weekly_history)
+                if len(habit_list) > 0:
+                    index_input = input("Índice del hábito: ")
+                    if index_input.isdigit():
+                        index = int(index_input) - 1
+                        print("\nSelecciona el día:")
+                        for i in range(7):
+                            print(f"{i + 1}. {DAYS[i]}")
+                        day_input = input("Día: ")
+                        if day_input.isdigit():
+                            day = int(day_input) - 1
+                            complete_habit(habit_list, weekly_history, index, day)
+                        else:
+                            print("Ingresa un día válido.")
+                    else:
+                        print("Ingresa un número válido.")
+
+            case "7":
+                clear_habits(habit_list, weekly_history)
+                print("¡Qué gran nuevo comienzo!")
+
+            case "8":
+                display_statistics(habit_list, weekly_history)
+
+            # MATRIZ SEMANAL
+            case "9":
+                display_weekly_matrix(habit_list, weekly_history)
+
+            case "10":
+                confirm = input("¿Deseas reiniciar el seguimiento semanal? (s/n): ")
+
+                if confirm.lower() == "s":
+
+                    reset_weekly_matrix(habit_list, weekly_history)
+                else:
+                    print("Operación cancelada.")
+
+            case "0":
+                print("Gracias por usar Shell Check.")
+                break
+
             case _:
-                print("Opcion invalida.")
+                print("Opción inválida. Intenta nuevamente.")
 
-main()
+
+if __name__ == "__main__":
+    main()
